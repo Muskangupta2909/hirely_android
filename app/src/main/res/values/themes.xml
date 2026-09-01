@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Main app theme -->
+    <style
+        name="Theme.Hirely"
+        parent="android:Theme.Material.Light.NoActionBar" />
+
+    <!-- Default Android Splash Screen -->
+    <style
+        name="Theme.Hirely.Splash"
+        parent="Theme.SplashScreen">
+
+        <!-- White background -->
+        <item name="windowSplashScreenBackground">
+            @android:color/white
+        </item>
+
+        <!-- Hirely H logo -->
+        <item name="windowSplashScreenAnimatedIcon">
+            @drawable/hirely_logo
+        </item>
+
+        <!-- Normal app theme after splash -->
+        <item name="postSplashScreenTheme">
+            @style/Theme.Hirely
+        </item>
+
+    </style>
+
+</resources>
