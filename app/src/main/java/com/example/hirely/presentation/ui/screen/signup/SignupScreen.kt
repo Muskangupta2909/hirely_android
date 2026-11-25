@@ -44,7 +44,7 @@ fun SignupScreen(
     // ViewModel ki current state observe kar rahe hain
     val uiState by viewModel.uiState.collectAsState()
 
-    var isPasswordVisible by remember {
+    var isPasswordVisible by remember { //password feild vissible maintain
         mutableStateOf(false)
     }
 
