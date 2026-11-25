@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.example.hirely.data.model.User
+import com.example.hirely.domain.model.User
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.json.JSONArray
@@ -61,6 +61,8 @@ class DataStoreManager(
                 put("email", user.email)
                 put("phone", user.phone)
                 put("password", user.password)
+                // User ka role bhi save hoga
+                put("role", user.role)
             }
 
             // New user ko existing list mein add kar rahe hain
@@ -95,7 +97,11 @@ class DataStoreManager(
                         name = userJson.getString("name"),
                         email = userJson.getString("email"),
                         phone = userJson.getString("phone"),
-                        password = userJson.getString("password")
+                        password = userJson.getString("password"),
+
+                        // Saved role read kar rahe hain
+                        // Old users ke liye USER default rahega
+                        role = userJson.optString("role", "USER")
                     )
                 )
             }

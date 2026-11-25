@@ -1,4 +1,4 @@
-package com.example.hirely.data.model
+package com.example.hirely.domain.model
 
 // Registered user ki details represent karta hai
 data class User(
@@ -13,5 +13,7 @@ data class User(
     val phone: String,
 
     // User ka password
-    val password: String
+    val password: String,
+
+    val role: String = "USER"
 )

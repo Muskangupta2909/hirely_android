@@ -1,4 +1,7 @@
 package com.example.hirely
 
-class HirelyApplication {
-}
+import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
+
+@HiltAndroidApp
+class HirelyApplication : Application()

@@ -1,8 +1,8 @@
-package com.example.hirely.viewmodel
+package com.example.hirely.presentation.viewmodel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import com.example.hirely.data.model.Job
+import com.example.hirely.domain.model.Job
 
 class JobListingViewModel : ViewModel() {
 

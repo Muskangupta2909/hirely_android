@@ -1,6 +1,10 @@
-package com.example.hirely.ui.screen.login
+package com.example.hirely.presentation.ui.screen.login
 
+
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,12 +13,18 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -27,18 +37,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hirely.viewmodel.LoginViewModel
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.hirely.presentation.viewmodel.LoginViewModel
 
+private val HirelyBlue = Color(0xFF243EAA)
+private val HirelyGray = Color(0xFF6B7280)
+private val HirelyBorder = Color(0xFFD9DCE5)
+private val HirelyFieldBg = Color(0xFFF7F8FC)
 
 // ---------------------------------------------------------
 // Hirely Login Screen
@@ -48,293 +69,311 @@ import com.example.hirely.viewmodel.LoginViewModel
 fun LoginScreen(
 
     // Login successful hone ke baad call hoga
-
-    onLoginSuccess: () -> Unit,
+    onLoginSuccess: (String) -> Unit,
     onSignupClick: () -> Unit,
+    onBackClick: () -> Unit = {},
 
     // LoginViewModel ko screen ke saath connect kar rahe hain
-    viewModel: LoginViewModel = viewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
 
     // ViewModel ki current UI state observe kar rahe hain
     val uiState by viewModel.uiState.collectAsState()
 
     // Password show/hide karne ki temporary UI state
-    var isPasswordVisible by remember {
-        mutableStateOf(false)
-    }
+    var isPasswordVisible by remember { mutableStateOf(false) }
 
+    val focusManager = LocalFocusManager.current
+    val passwordFocusRequester = remember { FocusRequester() }
 
     // -----------------------------------------------------
     // Main Background
     // -----------------------------------------------------
 
-    Box(
+    Column(
         modifier = Modifier
-            .fillMaxSize()
+            .fillMaxSize().imePadding()
             .background(Color.White)
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 24.dp, vertical = 16.dp)
     ) {
 
-
-    // -------------------------------------------------
-        // Login Card
-        // -------------------------------------------------
-
-        Column(
+        // -----------------------------
+        // Back button
+        // -----------------------------
+        Box(
             modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(
-                    horizontal = 24.dp,
-                    vertical = 40.dp
-                ),
-
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .size(36.dp)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) { onBackClick() },
+            contentAlignment = Alignment.CenterStart
         ) {
+            BackChevron()
+        }
 
+        Spacer(modifier = Modifier.height(12.dp))
 
-            // -------------------------------------------------
-            // Heading
-            // -------------------------------------------------
-
+        // -----------------------------
+        // Logo
+        // -----------------------------
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(64.dp)
+                .background(HirelyBlue, RoundedCornerShape(16.dp)),
+            contentAlignment = Alignment.Center
+        ) {
             Text(
-                text = "Welcome Back!",
-                color = Color(0xFF243EAA),
-                fontSize = 30.sp,
+                text = "H",
+                color = Color.White,
+                fontSize = 28.sp,
                 fontWeight = FontWeight.Bold
             )
+        }
 
-            Spacer(
-                modifier = Modifier.height(6.dp)
-            )
+        Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                text = "Login to your account",
-                color = Color(0xFF6B7280),
-                fontSize = 14.sp
-            )
+        Text(
+            text = "Hirely",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = Color(0xFF111111),
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold
+        )
 
-            Spacer(
-                modifier = Modifier.height(24.dp)
-            )
+        Spacer(modifier = Modifier.height(10.dp))
 
+        Text(
+            text = "Welcome Back!",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = Color(0xFF111111),
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold
+        )
 
-            // -------------------------------------------------
-            // Email Field
-            // -------------------------------------------------
+        Spacer(modifier = Modifier.height(4.dp))
 
-            OutlinedTextField(
-                value = uiState.email,
+        Text(
+            text = "Login to continue",
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center,
+            color = HirelyGray,
+            fontSize = 14.sp
+        )
 
-                onValueChange = {
-                    viewModel.onEmailChange(it)
-                },
+        Spacer(modifier = Modifier.height(28.dp))
 
-                modifier = Modifier.fillMaxWidth(),
+        // -------------------------------------------------
+        // Email Field
+        // -------------------------------------------------
 
-                label = {
-                    Text("Email")
-                },
+        OutlinedTextField(
+            value = uiState.email,
+            onValueChange = { viewModel.onEmailChange(it) },
+            modifier = Modifier.fillMaxWidth(),
+            leadingIcon = {
+                Text(text = "✉️", fontSize = 16.sp)
+            },
+            placeholder = { Text("Enter your email") },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Email,
+                imeAction = ImeAction.Next
+            ),
+            keyboardActions = KeyboardActions(
+                onNext = { passwordFocusRequester.requestFocus() }
+            ),
+            shape = RoundedCornerShape(12.dp),
+            colors = hirelyLoginTextFieldColors()
+        )
 
-                placeholder = {
-                    Text("Enter your email")
-                },
+        Spacer(modifier = Modifier.height(14.dp))
 
-                singleLine = true,
+        // -------------------------------------------------
+        // Password Field
+        // -------------------------------------------------
 
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-
-                shape = RoundedCornerShape(10.dp),
-
-                colors = hirelyLoginTextFieldColors()
-            )
-
-
-            Spacer(
-                modifier = Modifier.height(14.dp)
-            )
-
-
-            // -------------------------------------------------
-            // Password Field
-            // -------------------------------------------------
-
-            OutlinedTextField(
-                value = uiState.password,
-
-                onValueChange = {
-                    viewModel.onPasswordChange(it)
-                },
-
-                modifier = Modifier.fillMaxWidth(),
-
-                label = {
-                    Text("Password")
-                },
-
-                placeholder = {
-                    Text("Enter your password")
-                },
-
-                // Password show/hide
-                visualTransformation = if (isPasswordVisible) {
-                    VisualTransformation.None
-                } else {
-                    PasswordVisualTransformation()
-                },
-
-                // Show / Hide button
-                trailingIcon = {
-                    TextButton(
-                        onClick = {
-                            isPasswordVisible = !isPasswordVisible
-                        }
-                    ) {
-                        Text(
-                            text = if (isPasswordVisible) {
-                                "Hide"
-                            } else {
-                                "Show"
-                            },
-                            color = Color(0xFF243EAA)
-                        )
-                    }
-                },
-
-                singleLine = true,
-
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password
-                ),
-
-                shape = RoundedCornerShape(10.dp),
-
-                colors = hirelyLoginTextFieldColors()
-            )
-
-
-            // -------------------------------------------------
-            // Forgot Password
-            // -------------------------------------------------
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-
-                horizontalArrangement = Arrangement.End
-            ) {
-
-                TextButton(
-                    onClick = {
-                        // Forgot password later add
-                    }
-                ) {
+        OutlinedTextField(
+            value = uiState.password,
+            onValueChange = { viewModel.onPasswordChange(it) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .focusRequester(passwordFocusRequester),
+            leadingIcon = {
+                Text(text = "🔒", fontSize = 16.sp)
+            },
+            placeholder = { Text("Enter your password") },
+            visualTransformation = if (isPasswordVisible) {
+                VisualTransformation.None
+            } else {
+                PasswordVisualTransformation()
+            },
+            trailingIcon = {
+                TextButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                     Text(
-                        text = "Forgot Password?",
-                        color = Color(0xFF243EAA),
-                        fontSize = 13.sp
+                        text = if (isPasswordVisible) "Hide" else "Show",
+                        color = HirelyBlue
                     )
                 }
-            }
+            },
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Password,
+                imeAction = ImeAction.Done
+            ),
+            keyboardActions = KeyboardActions(
+                onDone = { focusManager.clearFocus() }
+            ),
+            shape = RoundedCornerShape(12.dp),
+            colors = hirelyLoginTextFieldColors()
+        )
 
+        // -------------------------------------------------
+        // Forgot Password
+        // -------------------------------------------------
 
-            Spacer(
-                modifier = Modifier.height(8.dp)
-            )
-
-
-            // -------------------------------------------------
-            // Login Button
-            // -------------------------------------------------
-
-            Button(
-                    onClick = {
-
-                        viewModel.login(
-                            onLoginSuccess = onLoginSuccess
-                        )
-                    },
-
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-
-                enabled = !uiState.isLoading,
-
-                shape = RoundedCornerShape(10.dp),
-
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF243EAA),
-                    contentColor = Color.White
-                )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                onClick = { /* Forgot password later add */ }
             ) {
-
                 Text(
-                    text = if (uiState.isLoading) {
-                        "Logging in..."
-                    } else {
-                        "Login"
-                    },
-
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-
-            Spacer(
-                modifier = Modifier.height(20.dp)
-            )
-
-
-            // -------------------------------------------------
-            // Signup Navigation
-            // -------------------------------------------------
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-
-                horizontalArrangement = Arrangement.Center,
-
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-
-                Text(
-                    text = "Don't have an account?",
-                    color = Color(0xFF6B7280),
-                    fontSize = 13.sp
-                )
-
-                TextButton(
-                    onClick = {
-                        onSignupClick()
-
-                    }
-                ) {
-                    Text(
-                        text = "Sign Up",
-                        color = Color(0xFF243EAA),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-            }
-
-
-            // -------------------------------------------------
-            // Error Message
-            // -------------------------------------------------
-
-            uiState.errorMessage?.let { error ->
-
-                Text(
-                    text = error,
-                    color = Color(0xFFFF8A8A),
-                    fontSize = 13.sp
+                    text = "Forgot Password?",
+                    color = HirelyBlue,
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        // -------------------------------------------------
+        // Login Button
+        // -------------------------------------------------
+
+        Button(
+            onClick = {
+                viewModel.login(
+                    onLoginSuccess = { role ->
+                        onLoginSuccess(role)
+                    }
+                )
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            enabled = !uiState.isLoading,
+            shape = RoundedCornerShape(26.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = HirelyBlue,
+                contentColor = Color.White
+            )
+        ) {
+            Text(
+                text = if (uiState.isLoading) "Logging in..." else "Login",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        // -------------------------------------------------
+        // OR CONTINUE WITH divider
+        // -------------------------------------------------
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            HorizontalDivider(modifier = Modifier.weight(1f), color = HirelyBorder)
+            Text(
+                text = "  or continue with  ",
+                color = HirelyGray,
+                fontSize = 12.sp
+            )
+            HorizontalDivider(modifier = Modifier.weight(1f), color = HirelyBorder)
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // -------------------------------------------------
+        // Social buttons
+        // -------------------------------------------------
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            OutlinedButton(
+                onClick = { /* TODO: Google login */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "G", color = Color(0xFF4285F4), fontWeight = FontWeight.Bold)
+            }
+
+            OutlinedButton(
+                onClick = { /* TODO: LinkedIn login */ },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(48.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text(text = "in", color = Color(0xFF0A66C2), fontWeight = FontWeight.Bold)
+            }
+        }
+
+        Spacer(modifier = Modifier.weight(1f))
+
+        // -------------------------------------------------
+        // Signup Navigation
+        // -------------------------------------------------
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Don't have an account? ",
+                color = Color(0xFF202124),
+                fontSize = 13.sp
+            )
+            Text(
+                text = "Sign Up",
+                color = HirelyBlue,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.clickable { onSignupClick() }
+            )
+        }
+
+        // -------------------------------------------------
+        // Error Message
+        // -------------------------------------------------
+
+        uiState.errorMessage?.let { error ->
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = error,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = Color(0xFFFF8A8A),
+                fontSize = 13.sp
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
     }
 }
 
@@ -351,22 +390,39 @@ private fun hirelyLoginTextFieldColors() =
         focusedTextColor = Color(0xFF202124),
         unfocusedTextColor = Color(0xFF202124),
 
-        // Label
-        focusedLabelColor = Color(0xFF243EAA),
-        unfocusedLabelColor = Color(0xFF6B7280),
-
         // Placeholder
-        focusedPlaceholderColor = Color(0xFF6B7280),
-        unfocusedPlaceholderColor = Color(0xFF6B7280),
+        focusedPlaceholderColor = HirelyGray,
+        unfocusedPlaceholderColor = HirelyGray,
 
         // Border
-        focusedBorderColor = Color(0xFF243EAA),
-        unfocusedBorderColor = Color(0xFFD9DCE5),
+        focusedBorderColor = HirelyBlue,
+        unfocusedBorderColor = HirelyBorder,
 
         // Cursor
-        cursorColor = Color(0xFF243EAA),
+        cursorColor = HirelyBlue,
 
         // Input background
-        focusedContainerColor = Color(0xFFF7F8FC),
-        unfocusedContainerColor = Color(0xFFF7F8FC)
+        focusedContainerColor = HirelyFieldBg,
+        unfocusedContainerColor = HirelyFieldBg
     )
+
+// ---------------------------------------------------------
+// Back Chevron Icon
+// ---------------------------------------------------------
+
+@Composable
+private fun BackChevron(modifier: Modifier = Modifier) {
+    Canvas(modifier = modifier.size(22.dp)) {
+        val strokeWidth = 2.5.dp.toPx()
+        val path = Path().apply {
+            moveTo(size.width * 0.62f, size.height * 0.2f)
+            lineTo(size.width * 0.32f, size.height * 0.5f)
+            lineTo(size.width * 0.62f, size.height * 0.8f)
+        }
+        drawPath(
+            path = path,
+            color = Color(0xFF202124),
+            style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
+        )
+    }
+}

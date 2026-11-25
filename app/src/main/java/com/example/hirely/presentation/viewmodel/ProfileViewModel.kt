@@ -1,10 +1,10 @@
-package com.example.hirely.viewmodel
+package com.example.hirely.presentation.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hirely.data.DataStoreManager
-import com.example.hirely.data.model.User
+import com.example.hirely.domain.model.User
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

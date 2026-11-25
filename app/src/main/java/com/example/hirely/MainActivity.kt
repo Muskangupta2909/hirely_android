@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.example.hirely.navigation.NavGraph
-import com.example.hirely.ui.theme.HirelyTheme
+import com.example.hirely.presentation.navigation.NavGraph
+import com.example.hirely.presentation.ui.screen.wallet.WalletScreen
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,9 +20,14 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
 
         setContent {
-            HirelyTheme {
+            _root_ide_package_.com.example.hirely.presentation.ui.theme.HirelyTheme {
                 // App ka navigation yahan se start hoga
-                NavGraph()
+               // NavGraph()
+                WalletScreen(
+                    onBackClick = {
+                        finish()
+                    }
+                )
             }
         }
     }

@@ -1,4 +1,4 @@
-package com.example.hirely.viewmodel
+package com.example.hirely.presentation.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

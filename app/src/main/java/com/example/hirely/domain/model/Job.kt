@@ -1,4 +1,4 @@
-package com.example.hirely.data.model
+package com.example.hirely.domain.model
 
 data class Job(
     val title: String,

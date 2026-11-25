@@ -1,4 +1,18 @@
 package com.example.hirely.di
 
-class RepositoryModule {
+import com.example.hirely.data.repository.UserRepositoryImpl
+import com.example.hirely.domain.repository.UserRepository
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
+import dagger.hilt.components.SingletonComponent
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class RepositoryModule {
+
+    @Binds
+    abstract fun bindUserRepository(
+        implementation: UserRepositoryImpl
+    ): UserRepository
 }

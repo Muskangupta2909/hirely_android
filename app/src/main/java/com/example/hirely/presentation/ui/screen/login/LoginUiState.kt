@@ -1,4 +1,4 @@
-package com.example.hirely.ui.screen.login
+package com.example.hirely.presentation.ui.screen.login
 
 // Login screen ki saari UI state ko represent karta hai
 data class LoginUiState(
@@ -13,5 +13,9 @@ data class LoginUiState(
     val isLoading: Boolean = false,
 
     // Agar koi error aaye toh message yahan store hoga
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+
+    // Logged-in user's role
+    // Default USER rahega
+    val role: String = "USER"
 )

@@ -1,21 +1,25 @@
-package com.example.hirely.viewmodel
+package com.example.hirely.presentation.viewmodel
 
-import android.app.Application
 import android.util.Log
-import androidx.lifecycle.AndroidViewModel
+import android.util.Patterns
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.hirely.data.DataStoreManager
-import com.example.hirely.data.model.User
-import com.example.hirely.ui.screen.signup.SignupUiState
+
+import com.example.hirely.domain.model.User
+import com.example.hirely.domain.usecase.SignupUseCase
+import com.example.hirely.presentation.ui.screen.signup.SignupUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 // Signup screen ka business logic yahan rahega
-class SignupViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+@HiltViewModel
+class SignupViewModel @Inject constructor(
+    private val signupUseCase: SignupUseCase
+) : ViewModel() {
 
     // Internal mutable state
     // Sirf ViewModel isko modify karega
@@ -26,8 +30,8 @@ class SignupViewModel(
         _uiState.asStateFlow()
 
     // DataStore ko handle karne ke liye manager
-    private val dataStoreManager =
-        DataStoreManager(getApplication())
+//    private val dataStoreManager =
+//        DataStoreManager(getApplication())
 
 
     // ---------------------------------------------------------
@@ -134,7 +138,7 @@ class SignupViewModel(
 
 
         // Email validation
-        if (!android.util.Patterns.EMAIL_ADDRESS
+        if (!Patterns.EMAIL_ADDRESS
                 .matcher(currentState.email.trim())
                 .matches()
         ) {
@@ -198,30 +202,23 @@ class SignupViewModel(
 
             try {
 
-                // Registered user ko DataStore mein save karenge
-                dataStoreManager.saveUser(user)
+                signupUseCase(user)
 
                 Log.d(
                     "HIRELY_SIGNUP",
                     "USER SAVED: ${user.email}"
                 )
 
-                // Save successful hone ke baad navigation
                 onSuccess()
 
             } catch (e: Exception) {
-
-                // Agar DataStore mein koi error aaye
-                Log.e(
-                    "HIRELY_SIGNUP",
-                    "ERROR SAVING USER",
-                    e
-                )
+                Log.e("HIRELY_SIGNUP", "ERROR SAVING USER", e)
 
                 _uiState.value = _uiState.value.copy(
-                    errorMessage = "Something went wrong"
+                    errorMessage = e.message ?: "Something went wrong"
                 )
             }
+
         }
     }
 }

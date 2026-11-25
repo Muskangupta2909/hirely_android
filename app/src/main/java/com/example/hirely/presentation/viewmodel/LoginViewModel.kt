@@ -1,39 +1,40 @@
-package com.example.hirely.viewmodel
+package com.example.hirely.presentation.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import android.content.Context
+import android.util.Patterns
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hirely.data.AdminCredentials
 import com.example.hirely.data.DataStoreManager
-import com.example.hirely.ui.screen.login.LoginUiState
+import com.example.hirely.domain.usecase.LoginUseCase
+import com.example.hirely.presentation.ui.screen.login.LoginUiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-// Login screen ka business logic yahan rahega
-class LoginViewModel(
-    application: Application
-) : AndroidViewModel(application) {
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginUseCase: LoginUseCase,
+    @ApplicationContext private val context: Context
+) : ViewModel() {
 
-    // Internal mutable state
-    // Sirf ViewModel isko modify karega
     private val _uiState = MutableStateFlow(LoginUiState())
 
-    // UI ko read-only state provide karenge
     val uiState: StateFlow<LoginUiState> =
         _uiState.asStateFlow()
 
-    // DataStore ko handle karne ke liye manager
     private val dataStoreManager =
-        DataStoreManager(getApplication())
+        DataStoreManager(context)
 
 
     // ---------------------------------------------------------
     // Email / Phone
     // ---------------------------------------------------------
 
-    // Email ya phone change hone par state update karega
     fun onEmailChange(email: String) {
 
         _uiState.value = _uiState.value.copy(
@@ -47,7 +48,6 @@ class LoginViewModel(
     // Password
     // ---------------------------------------------------------
 
-    // Password change hone par state update karega
     fun onPasswordChange(password: String) {
 
         _uiState.value = _uiState.value.copy(
@@ -61,13 +61,12 @@ class LoginViewModel(
     // Login
     // ---------------------------------------------------------
 
-    // Login button click hone par call hoga
     fun login(
-        onLoginSuccess: () -> Unit
+        onLoginSuccess: (String) -> Unit
     ) {
 
-        // Current login state
         val currentState = _uiState.value
+
 
         // Email required
         if (currentState.email.trim().isEmpty()) {
@@ -79,6 +78,7 @@ class LoginViewModel(
             return
         }
 
+
         // Password required
         if (currentState.password.isEmpty()) {
 
@@ -89,8 +89,9 @@ class LoginViewModel(
             return
         }
 
-        // Email format validation
-        if (!android.util.Patterns.EMAIL_ADDRESS
+
+        // Email validation
+        if (!Patterns.EMAIL_ADDRESS
                 .matcher(currentState.email.trim())
                 .matches()
         ) {
@@ -102,37 +103,70 @@ class LoginViewModel(
             return
         }
 
+
         // Loading start
         _uiState.value = currentState.copy(
             isLoading = true,
             errorMessage = null
         )
 
-        // Coroutine start
+
         viewModelScope.launch {
 
-            // DataStore se saare registered users read kar rahe hain
-            val users = dataStoreManager.users.first()
+            // =================================================
+            // ADMIN LOGIN CHECK
+            // =================================================
 
-            // Email ya Phone se matching user find kar rahe hain
-            val user = users.find { registeredUser ->
-
-                registeredUser.email.equals(
-                    currentState.email,
+            val isAdmin =
+                currentState.email.trim().equals(
+                    AdminCredentials.EMAIL,
                     ignoreCase = true
-                ) || registeredUser.phone == currentState.email
+                ) &&
+                        currentState.password ==
+                        AdminCredentials.PASSWORD
+
+
+            // =================================================
+            // ADMIN LOGIN
+            // =================================================
+
+            if (isAdmin) {
+
+                dataStoreManager.saveLoginData(
+                    email = AdminCredentials.EMAIL
+                )
+
+                _uiState.value = currentState.copy(
+                    isLoading = false,
+                    errorMessage = null,
+                    role = "ADMIN"
+                )
+
+                onLoginSuccess("ADMIN")
+
+                return@launch
             }
 
+
+            // =================================================
+            // NORMAL USER LOGIN
+            // =================================================
+
+            val user = loginUseCase(
+                email = currentState.email.trim(),
+                password = currentState.password
+            )
+
+
             // -------------------------------------------------
-            // User nahi mila
+            // User not found
             // -------------------------------------------------
 
             if (user == null) {
 
                 _uiState.value = currentState.copy(
                     isLoading = false,
-                    errorMessage =
-                        "Invalid email or password"
+                    errorMessage = "Invalid email or password"
                 )
 
                 return@launch
@@ -140,38 +174,20 @@ class LoginViewModel(
 
 
             // -------------------------------------------------
-            // Password check
+            // User valid
             // -------------------------------------------------
 
-            if (user.password != currentState.password) {
-
-                _uiState.value = currentState.copy(
-                    isLoading = false,
-                    errorMessage =
-                        "Invalid email/phone or password"
-                )
-
-                return@launch
-            }
-
-
-            // -------------------------------------------------
-            // User valid hai
-            // -------------------------------------------------
-
-            // Current logged-in user ka email save karenge
             dataStoreManager.saveLoginData(
                 email = user.email
             )
 
-            // Loading stop
             _uiState.value = currentState.copy(
                 isLoading = false,
-                errorMessage = null
+                errorMessage = null,
+                role = "USER"
             )
 
-            // Login successful
-            onLoginSuccess()
+            onLoginSuccess("USER")
         }
     }
 }

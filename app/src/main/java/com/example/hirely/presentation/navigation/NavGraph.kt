@@ -1,4 +1,4 @@
-package com.example.hirely.navigation
+package com.example.hirely.presentation.navigation
 
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -14,11 +14,12 @@ import androidx.navigation.compose.rememberNavController
 
 import kotlinx.coroutines.launch
 import com.example.hirely.data.DataStoreManager
-import com.example.hirely.ui.screen.joblisting.JobListingScreen
-import com.example.hirely.ui.screen.login.LoginScreen
-import com.example.hirely.ui.screen.onboarding.OnboardingScreen
-import com.example.hirely.ui.screen.profile.ProfileScreen
-import com.example.hirely.ui.screen.signup.SignupScreen
+import com.example.hirely.presentation.ui.screen.home.HomeScreen
+import com.example.hirely.presentation.ui.screen.joblisting.JobListingScreen
+import com.example.hirely.presentation.ui.screen.login.LoginScreen
+import com.example.hirely.presentation.ui.screen.onboarding.OnboardingScreen
+import com.example.hirely.presentation.ui.screen.profile.ProfileScreen
+import com.example.hirely.presentation.ui.screen.signup.SignupScreen
 import kotlinx.coroutines.flow.first
 
 @Composable
@@ -62,13 +63,15 @@ fun NavGraph() {
 
         // First time → Onboarding
         // Already completed → Login
-        startDestination = "job_listing"
-//        startDestination =
-//            if (onboardingCompleted.value == true) {
-//                "login"
-//            } else {
-//                "onboarding"
-//            }
+       // startDestination = "job_listing"
+
+                //startDestination = "home"
+        startDestination =
+            if (onboardingCompleted.value == true) {
+                "login"
+            } else {
+                "onboarding"
+            }
     ) {
 
         composable("job_listing") {
@@ -108,9 +111,9 @@ fun NavGraph() {
 
             LoginScreen(
 
-                onLoginSuccess = {
+                onLoginSuccess = { role ->
 
-                    navController.navigate("profile") {
+                    navController.navigate("home/$role") {
 
                         popUpTo("login") {
                             inclusive = true
@@ -124,6 +127,39 @@ fun NavGraph() {
                 }
             )
         }
+
+        // -------------------------------------------------
+// HOME
+// -------------------------------------------------
+
+        composable("home/{role}") { backStackEntry ->
+
+            val role =
+                backStackEntry.arguments?.getString("role")
+                    ?: "USER"
+
+            HomeScreen(
+
+                userName = if (role == "ADMIN") {
+                    "Admin"
+                } else {
+                    "User"
+                },
+
+                role = role,
+
+                onCreateJobClick = {
+
+                    navController.navigate("create_job")
+                },
+
+                onJobListClick = {
+
+                    navController.navigate("job_listing")
+                }
+            )
+        }
+
 
 
         // -------------------------------------------------

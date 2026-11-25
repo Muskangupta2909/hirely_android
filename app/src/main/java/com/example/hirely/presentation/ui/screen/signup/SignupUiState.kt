@@ -1,4 +1,4 @@
-package com.example.hirely.ui.screen.signup
+package com.example.hirely.presentation.ui.screen.signup
 
 // Signup screen ki saari UI state ko represent karta hai
 data class SignupUiState(

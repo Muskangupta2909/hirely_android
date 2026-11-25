@@ -1,2 +1,5 @@
-package com.example.hirely.data.repository 
+package com.example.hirely.data.repository
 
+class JobRepositoryImpl {
+
+}

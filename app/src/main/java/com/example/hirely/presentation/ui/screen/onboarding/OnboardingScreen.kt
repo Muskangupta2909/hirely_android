@@ -1,4 +1,4 @@
-package com.example.hirely.ui.screen.onboarding
+package com.example.hirely.presentation.ui.screen.onboarding
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -42,15 +42,15 @@ fun OnboardingScreen(
 ) {
 
     val pages = listOf(
-        OnboardingPage(
+        _root_ide_package_.com.example.hirely.presentation.ui.screen.onboarding.OnboardingPage(
             title = "Register Your Account",
             description = "Find the workers you want or need from all the workers listed."
         ),
-        OnboardingPage(
+        _root_ide_package_.com.example.hirely.presentation.ui.screen.onboarding.OnboardingPage(
             title = "Hire The Workers",
             description = "Choose the best workers that you want to work with."
         ),
-        OnboardingPage(
+        _root_ide_package_.com.example.hirely.presentation.ui.screen.onboarding.OnboardingPage(
             title = "Let's Work Together",
             description = "Enjoy the job you choose and achieve the best success."
         )

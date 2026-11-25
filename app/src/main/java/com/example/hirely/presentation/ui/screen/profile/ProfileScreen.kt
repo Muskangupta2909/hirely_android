@@ -1,4 +1,4 @@
-package com.example.hirely.ui.screen.profile
+package com.example.hirely.presentation.ui.screen.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.hirely.viewmodel.ProfileViewModel
+import com.example.hirely.presentation.viewmodel.ProfileViewModel
 
 @Composable
 fun ProfileScreen(

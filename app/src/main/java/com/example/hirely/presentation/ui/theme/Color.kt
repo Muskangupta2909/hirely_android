@@ -1,4 +1,4 @@
-package com.example.hirely.ui.theme
+package com.example.hirely.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

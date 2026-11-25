@@ -1,4 +1,4 @@
-package com.example.hirely.ui.theme
+package com.example.hirely.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -12,34 +12,34 @@ import androidx.compose.ui.platform.LocalContext
 
 // Dark theme color scheme
 private val DarkColorScheme = darkColorScheme(
-    primary = PrimaryBlue,
-    secondary = DarkColor,
-    tertiary = TextGray
+    primary = _root_ide_package_.com.example.hirely.presentation.ui.theme.PrimaryBlue,
+    secondary = _root_ide_package_.com.example.hirely.presentation.ui.theme.DarkColor,
+    tertiary = _root_ide_package_.com.example.hirely.presentation.ui.theme.TextGray
 )
 
 // Light theme color scheme
 private val LightColorScheme = lightColorScheme(
-    primary = PrimaryBlue,
-    secondary = DarkColor,
-    tertiary = TextGray,
+    primary = _root_ide_package_.com.example.hirely.presentation.ui.theme.PrimaryBlue,
+    secondary = _root_ide_package_.com.example.hirely.presentation.ui.theme.DarkColor,
+    tertiary = _root_ide_package_.com.example.hirely.presentation.ui.theme.TextGray,
 
     // App ka main background
-    background = White,
+    background = _root_ide_package_.com.example.hirely.presentation.ui.theme.White,
 
     // Surface ka background
-    surface = White,
+    surface = _root_ide_package_.com.example.hirely.presentation.ui.theme.White,
 
     // Primary color ke upar text/icon
-    onPrimary = White,
+    onPrimary = _root_ide_package_.com.example.hirely.presentation.ui.theme.White,
 
     // Secondary color ke upar text/icon
-    onSecondary = White,
+    onSecondary = _root_ide_package_.com.example.hirely.presentation.ui.theme.White,
 
     // Background ke upar text
-    onBackground = TextDark,
+    onBackground = _root_ide_package_.com.example.hirely.presentation.ui.theme.TextDark,
 
     // Surface ke upar text
-    onSurface = TextDark
+    onSurface = _root_ide_package_.com.example.hirely.presentation.ui.theme.TextDark
 )
 
 @Composable
@@ -68,16 +68,16 @@ fun HirelyTheme(
         }
 
         // Dark mode
-        darkTheme -> DarkColorScheme
+        darkTheme -> _root_ide_package_.com.example.hirely.presentation.ui.theme.DarkColorScheme
 
         // Normal light mode
-        else -> LightColorScheme
+        else -> _root_ide_package_.com.example.hirely.presentation.ui.theme.LightColorScheme
     }
 
     // Puri application par selected theme apply karta hai
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = _root_ide_package_.com.example.hirely.presentation.ui.theme.Typography,
         content = content
     )
 }
